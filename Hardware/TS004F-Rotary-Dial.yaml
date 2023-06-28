@@ -4,7 +4,7 @@ blueprint:
     spinny ones). You can set functions for single press, rotating left, and rotating
     right. Based off of blizzrdof77's blueprint for a Moes smart knob.
   domain: automation
-  source_url: https://gist.github.com/blizzrdof77/c30c388ca5f4ce7ed72752296767417d#file-zha-moes-zigbee-rotary-smart-knob-remote-control-yaml
+  source_url: https://github.com/knabb215/Home-Assistant/blob/main/Hardware/TS004F-Rotary-Dial.yaml
   input:
     remote:
       name: Smart Knob Device
