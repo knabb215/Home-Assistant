@@ -32,26 +32,23 @@ blueprint:
         text:
           multiline: false
     command_single_press:
-      name: Single-press Command
-      description: Remote command name used for a single press.
-      default: PowerToggle
+      name: Single Press
+      description: Remote command name used for a single button press.
+      default: []
       selector:
-        text:
-          multiline: false
+        action: {}
     command_up:
       name: Up Command
       description: Remote command name used when dial is turned up/right (clockwise)
-      default: VolumeUp
+      default: []
       selector:
-        text:
-          multiline: false
+        action: {}
     command_down:
       name: Down Command
       description: Remote command name used when dial is turned down/left (counter-clockwise)
-      default: VolumeDown
+      default: []
       selector:
-        text:
-          multiline: false
+        action: {}
 mode: restart
 max_exceeded: silent
 trigger:
