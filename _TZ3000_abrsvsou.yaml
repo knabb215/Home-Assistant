@@ -1,8 +1,8 @@
 blueprint:
-  name: ZHA - Moes Tuya Smart Knob (TS004F) controller for remote control devices
-  description: Control remotes (e.g. volume up/down) with a Moes Tuya smart knob (the
+  name: Tuya Smart Knob
+  description: Control remotes (e.g. volume up/down) with a Tuya smart knob (the
     spinny ones). You can set functions for single press, rotating left, and rotating
-    right.
+    right. Based off of blizzrdof77's blueprint for a Moes smart knob.
   domain: automation
   source_url: https://gist.github.com/blizzrdof77/c30c388ca5f4ce7ed72752296767417d#file-zha-moes-zigbee-rotary-smart-knob-remote-control-yaml
   input:
