@@ -1,0 +1,121 @@
+blueprint:
+  name: ZHA - Moes Tuya Smart Knob (TS004F) controller for remote control devices
+  description: Control remotes (e.g. volume up/down) with a Moes Tuya smart knob (the
+    spinny ones). You can set functions for single press, rotating left, and rotating
+    right.
+  domain: automation
+  source_url: https://gist.github.com/blizzrdof77/c30c388ca5f4ce7ed72752296767417d#file-zha-moes-zigbee-rotary-smart-knob-remote-control-yaml
+  input:
+    remote:
+      name: Smart Knob Device
+      description: Moes Tuya Smart Knob Device to use
+      selector:
+        device:
+          integration: zha
+          manufacturer: _TZ3000_abrsvsou
+          model: TS004F
+          multiple: false
+    remote_entity:
+      name: Remote Entity
+      description: The remote to control
+      selector:
+        target:
+          entity:
+          - domain:
+            - remote
+    device_name:
+      name: Device Name/ID
+      description: The device name (or ID) associated with the chosen remote.
+      default: ''
+      selector:
+        text:
+          multiline: false
+    command_single_press:
+      name: Single-press Command
+      description: Remote command name used for a single press.
+      default: PowerToggle
+      selector:
+        text:
+          multiline: false
+    command_up:
+      name: Up Command
+      description: Remote command name used when dial is turned up/right (clockwise)
+      default: VolumeUp
+      selector:
+        text:
+          multiline: false
+    command_down:
+      name: Down Command
+      description: Remote command name used when dial is turned down/left (counter-clockwise)
+      default: VolumeDown
+      selector:
+        text:
+          multiline: false
+mode: restart
+max_exceeded: silent
+trigger:
+- platform: event
+  event_type: zha_event
+  event_data:
+    device_id: !input remote
+action:
+- variables:
+    command: '{{ trigger.event.data.command }}'
+    cluster_id: '{{ trigger.event.data.cluster_id }}'
+    endpoint_id: '{{ trigger.event.data.endpoint_id }}'
+    args: '{{ trigger.event.data.args }}'
+    step_type: "{%- if (trigger.event.data.args|list)|length == 3 -%}\n  {%- set args
+      = trigger.event.data.args|list -%}\n  {%- if args|first == 0 -%}\n    {{ 'up'
+      }}\n  {%- elif args|first == 1 -%}\n    {{ 'down' }}\n  {%- else -%}\n    {{
+      '' }}\n  {%- endif -%}\n{%- else -%}\n    {{ 'single_press' }}\n{%- endif -%}"
+    amount: "{%- if (trigger.event.data.args|list)|length == 3 -%}\n  {%- set args
+      = trigger.event.data.args|list -%}\n  {{ args[1]|int }}\n{%- else -%}\n  {{
+      0 }}\n{%- endif -%}"
+    rate: "{%- if (trigger.event.data.args|list)|length == 3 -%}\n  {%- set args =
+      trigger.event.data.args|list -%}\n  {{ args|last|int }}\n{%- else -%}\n  {{
+      0 }}\n{%- endif -%}"
+    cmd_single_press: !input command_single_press
+    cmd_up: !input command_up
+    cmd_down: !input command_down
+- choose:
+  - conditions:
+    - '{{ command == "toggle" }}'
+    - '{{ cluster_id == 6 }}'
+    - '{{ endpoint_id == 1 }}'
+    sequence:
+    - service: remote.send_command
+      target: !input remote_entity
+      data:
+        device: !input device_name
+        command: '{%- set cmd = (cmd_single_press|string)|replace('', '', '','')|trim
+          -%} {{ cmd.split('','') }}'
+  - conditions:
+    - '{{ command == "step" }}'
+    - '{{ cluster_id == 8 }}'
+    - '{{ endpoint_id == 1 }}'
+    - '{{ step_type == "up" }}'
+    sequence:
+    - service: remote.send_command
+      target: !input remote_entity
+      data:
+        num_repeats: '{{ (rate|int) + 1 }}'
+        delay_secs: 0.1
+        hold_secs: 0.1
+        device: !input device_name
+        command: '{%- set cmd = (cmd_up|string)|replace('', '', '','')|trim -%} {{
+          cmd.split('','') }}'
+  - conditions:
+    - '{{ command == "step" }}'
+    - '{{ cluster_id == 8 }}'
+    - '{{ endpoint_id == 1 }}'
+    - '{{ step_type == "down" }}'
+    sequence:
+    - service: remote.send_command
+      target: !input remote_entity
+      data:
+        num_repeats: '{{ (rate|int) + 1 }}'
+        delay_secs: 0.1
+        hold_secs: 0.1
+        device: !input device_name
+        command: '{%- set cmd = (cmd_down|string)|replace('', '', '','')|trim -%}
+          {{ cmd.split('','') }}'
