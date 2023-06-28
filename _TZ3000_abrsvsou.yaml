@@ -8,7 +8,7 @@ blueprint:
   input:
     remote:
       name: Smart Knob Device
-      description: Moes Tuya Smart Knob Device to use
+      description: Tuya Smart Knob Device to use
       selector:
         device:
           integration: zha
@@ -16,13 +16,14 @@ blueprint:
           model: TS004F
           multiple: false
     remote_entity:
-      name: Remote Entity
-      description: The remote to control
+      name: Target Device
+      description: The device to control
       selector:
         target:
           entity:
           - domain:
-            - remote
+            - light
+            - climate
     device_name:
       name: Device Name/ID
       description: The device name (or ID) associated with the chosen remote.
